@@ -14,6 +14,7 @@ export class AuthService {
     const { email, password } = signInDto;
 
     const user = await this.userService.getUserOrThrow(email);
+    if (user.isBanned) throw new BadRequestException("Account has been banned due to breach of security policy. Kindly contact support if you feel this was a mistake. Thank you.")
     await user.verifyPassword(password);
 
     const token = this.jwtService.sign({ sub: user.id, role: user.role });

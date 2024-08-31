@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { ObjectId, Model, FilterQuery, isObjectIdOrHexString } from 'mongoose';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { ObjectId, Model, FilterQuery, isObjectIdOrHexString, UpdateQuery } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { isEmail } from 'class-validator';
-import { User } from './schemas/user.schema';
+import { Role, User } from './schemas/user.schema';
 import { UserMethods } from './schemas/methods';
 import { SignUpDto } from 'src/auth/dto/signUp.dto';
 import { NotFoundException } from '@nestjs/common';
+import { ToggleUserBanDto } from './dto/toggle-user-ban.dto';
 
 type Identifier = string | ObjectId;
 
@@ -46,8 +47,33 @@ export class UsersService {
     return user;
   }
 
-  update(id: number, updateUserDto) {
-    return `This action updates a #${id} user`;
+  async getUsers() {
+
+    const users = await this.userModel
+      .find()
+      .sort({ createdAt: 1 })
+      .select(["-password", "-updatedAt"])
+      .limit(50)
+      .lean()
+      .exec();
+
+    return users;
+  }
+
+  async toggleUserBanStatus(toggleUserBanDto: ToggleUserBanDto) {
+    const { userId } = toggleUserBanDto
+    const user = await this.getUserOrThrow(userId)
+
+    if (user.isBanned === true) {
+      user.isBanned = false
+    } else {
+      user.isBanned = true
+    }
+
+    await user.save()
+
+    return { message: "Updated User Status successfully." }
+
   }
 
   remove(id: number) {
