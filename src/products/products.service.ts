@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
+import { CACHE_MANAGER, CacheKey, CacheTTL, Cache } from "@nestjs/cache-manager"
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product, ProductDocument, ProductStatus } from './schemas/product.schema';
@@ -12,6 +13,7 @@ export class ProductsService {
   constructor(
     @InjectModel(Product.name)
     private readonly productModel: Model<Product>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly userService: UsersService
   ) { }
   async create(dto: CreateProductDto, userId: string): Promise<ProductDocument> {
@@ -36,12 +38,21 @@ export class ProductsService {
     return { message: `Product has been ${product.isApproved}` };
   }
 
+  @CacheKey("view-products")
+  @CacheTTL(600)
   async viewProduct() {
     const filter: FilterQuery<ProductDocument> = {
       isApproved: ProductStatus.APPROVED
     };
 
+    const cachedProducts = await this.cacheManager.get("view-products")
+    if (cachedProducts) {
+      return cachedProducts;
+    }
+
     const approvedProducts = await this.productModel.find(filter).lean().exec();
+
+    await this.cacheManager.set("view-products", approvedProducts, 600);
 
     return approvedProducts;
   }

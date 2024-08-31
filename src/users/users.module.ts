@@ -5,6 +5,7 @@ import { User, UserSchema } from './schemas/user.schema';
 import { preSave } from './schemas/middleware';
 import { userMethods } from './schemas/methods';
 import { UsersController } from './users.controller';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UsersController } from './users.controller';
         },
       },
     ]),
+    CacheModule.register()
   ],
   controllers: [UsersController],
   exports: [UsersService, MongooseModule],

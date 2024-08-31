@@ -4,6 +4,7 @@ import { ProductsController } from './products.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Product, ProductSchema } from './schemas/product.schema';
 import { UsersModule } from 'src/users/users.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { UsersModule } from 'src/users/users.module';
       }
 
     }]),
-    UsersModule
+    UsersModule,
+    CacheModule.register()
   ],
   controllers: [ProductsController],
   providers: [ProductsService],
