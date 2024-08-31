@@ -64,11 +64,13 @@ export class UsersService {
     const { userId } = toggleUserBanDto
     const user = await this.getUserOrThrow(userId)
 
-    if (user.isBanned === true) {
-      user.isBanned = false
-    } else {
-      user.isBanned = true
-    }
+    // if (user.isBanned === true) {
+    //   user.isBanned = false
+    // } else {
+    //   user.isBanned = true
+    // }
+
+    user.isBanned = user.isBanned === true ? false : true
 
     await user.save()
 

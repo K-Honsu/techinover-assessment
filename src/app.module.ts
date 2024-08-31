@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { configuration } from './config';
 import { UsersModule } from './users/users.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -19,7 +20,7 @@ import { UsersModule } from './users/users.module';
         uri: configService.get<string>('db.uri'),
       };
     },
-  }), AuthModule, UsersModule],
+  }), AuthModule, UsersModule, ProductsModule],
   controllers: [AppController],
   providers: [AppService],
 })
