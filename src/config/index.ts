@@ -1,4 +1,4 @@
-export const APP_NAME = process.env.DB_APP_NAME
+export const APP_NAME = "techinnover"
 
 export const configuration = () => ({
     port: parseInt(process.env.PORT) || 3004,
