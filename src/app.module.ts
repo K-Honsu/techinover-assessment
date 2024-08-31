@@ -7,9 +7,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { configuration } from './config';
 import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
-  imports: [ConfigModule.forRoot({
+  imports: [ThrottlerModule.forRoot([{
+    ttl: 60000,
+    limit: 10
+  }]), ConfigModule.forRoot({
     load: [configuration],
     isGlobal: true
   }), MongooseModule.forRootAsync({
@@ -22,6 +27,9 @@ import { ProductsModule } from './products/products.module';
     },
   }), AuthModule, UsersModule, ProductsModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, {
+    provide: APP_GUARD,
+    useClass: ThrottlerGuard
+  }],
 })
 export class AppModule { }
