@@ -132,5 +132,6 @@ The API is organized into several modules:
 - Push to the branch (git push origin feature/your-feature-name).
 - Create a new Pull Request.
 
-License
+### License
+
 This project is licensed under the MIT License - see the LICENSE file for details.
